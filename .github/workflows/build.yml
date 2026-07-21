@@ -1,0 +1,62 @@
+name: Construir web
+
+# Se dispara cuando el panel web publica contenido o sube un vídeo nuevo.
+# Regenera index.html y re-codifica el vídeo del hero a all-intra con ffmpeg.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'panel/data/content.json'
+      - 'assets/raw/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: construir-web
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Re-codificar vídeo del hero (all-intra) si hay uno nuevo
+        run: |
+          shopt -s nullglob
+          raws=(assets/raw/hero-source.*)
+          if [ ${#raws[@]} -gt 0 ]; then
+            src="${raws[0]}"
+            echo "Re-codificando $src (cada frame keyframe, para el scroll-scrub)…"
+            mkdir -p assets/video
+            ffmpeg -y -i "$src" -an -c:v libx264 -preset medium -crf 20 \
+              -g 1 -keyint_min 1 -bf 0 -pix_fmt yuv420p \
+              -vf "scale=min(1920\,iw):-2" -movflags +faststart \
+              assets/video/hero-scrub.mp4
+            rm -f assets/raw/*
+          else
+            echo "No hay vídeo nuevo que procesar."
+          fi
+
+      - name: Regenerar index.html
+        run: node panel/build.js
+
+      - name: Publicar cambios
+        run: |
+          git config user.name "panel-bot"
+          git config user.email "panel-bot@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "Nada que publicar."
+          else
+            git commit -m "Web regenerada [skip ci]"
+            git pull --rebase origin main || true
+            git push
+          fi

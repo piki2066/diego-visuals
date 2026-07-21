@@ -27,6 +27,7 @@ function safeUrl(url) {
   if (!u) return '';
   if (/^https?:\/\//i.test(u)) return u;
   if (/^assets\/[\w\-./]+$/.test(u)) return u;
+  if (/^blob:/.test(u)) return u; // vista previa del panel web (archivos aún sin publicar)
   return '';
 }
 
@@ -349,4 +350,7 @@ function applyContent(html, rawContent) {
   return { html: out, missing };
 }
 
-module.exports = { applyContent, normalizeContent, ytId };
+// Funciona en Node (servidor local / GitHub Action) y en navegador (panel web).
+const PanelGenerate = { applyContent, normalizeContent, ytId };
+if (typeof module !== 'undefined' && module.exports) module.exports = PanelGenerate;
+if (typeof globalThis !== 'undefined') globalThis.PanelGenerate = PanelGenerate;

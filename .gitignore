@@ -2,4 +2,3 @@ node_modules/
 .DS_Store
 panel/config.local.json
 panel/data/backups/
-assets/uploads/.gitkeep

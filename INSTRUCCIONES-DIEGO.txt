@@ -1,33 +1,35 @@
 CÓMO ACTUALIZAR TU WEB — DIEGO VISUALS
 ========================================
 
-1. Entra en la carpeta "diego-visuals" y haz doble click en:
+Tu web:   https://piki2066.github.io/diego-visuals/
+Tu panel: https://piki2066.github.io/diego-visuals/admin/
 
-      EMPEZAR-PANEL.bat
+1. Abre el panel desde cualquier navegador (ordenador o móvil).
 
-   La primera vez tarda unos minutos preparándose.
-   Se abrirá una ventana negra: DÉJALA ABIERTA mientras uses el panel.
-
-2. Se te abre el navegador con el panel. Escribe tu contraseña
-   (te la ha dado Alex).
+2. La primera vez en cada aparato te pedirá tu CLAVE DE ACCESO
+   (te la da Alex). Se guarda y no te la vuelve a pedir.
 
 3. Cambia lo que quieras: trabajos, reseñas, clientes, números,
    textos, tu reel de portada...
 
    - "Vista previa"      → ves cómo quedaría, solo lo ves tú.
    - "Publicar cambios"  → se sube a tu web de verdad.
-                           Tarda ~1 minuto en verse en internet.
-   - "Historial"         → si la lías, vuelves a una versión anterior.
-
-4. Cuando acabes, cierra la ventana negra. Listo.
+                           Tarda 2-3 minutos en verse en internet.
+   - "Historial"         → si la lías, cargas una versión anterior
+                           y la vuelves a publicar.
 
 IMPORTANTE
 ----------
-- Para publicar necesitas internet (los cambios viajan a tu web).
 - Los trabajos van con enlaces de YouTube: sube el vídeo a tu canal,
   copia el enlace y pégalo en el trabajo. La miniatura se pone sola.
-- El reel de portada se procesa solo al subirlo; puede tardar unos
-  minutos, no cierres nada mientras.
+- El reel de portada: súbelo en mp4 (máx. 70 MB). Al publicar se
+  procesa solo en internet — no tienes que hacer nada.
+- La clave de acceso es como la llave de tu casa: no se la pases
+  a nadie. Si crees que se ha filtrado, avisa a Alex y te da otra.
 
-Tu web: https://piki2066.github.io/diego-visuals/
+PLAN B (por si el panel web fallara algún día)
+----------------------------------------------
+En la carpeta que te pasó Alex hay un archivo EMPEZAR-PANEL.bat:
+doble click y tendrás el mismo panel funcionando en tu ordenador.
+
 ¿Algo no va? Llama a Alex.

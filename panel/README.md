@@ -32,7 +32,19 @@ Sin `ADMIN_PASSWORD` usa `diego2026` (solo para desarrollo).
 | `UPLOADS_DIR` | Dónde se guardan los archivos subidos | `../assets/uploads` |
 | `FFMPEG_PATH` | Ruta a ffmpeg si no está en el PATH | autodetección |
 
-## Modo GitHub Pages (el elegido: panel en el PC de Diego, web gratis)
+## Panel web (el principal): 100 % en el navegador, sin instalar nada
+
+**Panel:** `https://piki2066.github.io/diego-visuals/admin/` · **Web:** `https://piki2066.github.io/diego-visuals/`
+
+- `admin/index.html` es una página estática (Pages la sirve). Habla directamente con la API de GitHub desde el navegador; la "clave de acceso" de Diego es un **fine-grained PAT** limitado al repo (Contents: Read and write) que queda guardado en localStorage de su navegador — una vez por dispositivo.
+- Al **Publicar**, el navegador hace un commit con `panel/data/content.json` + los archivos subidos (fotos → `assets/uploads/`, reel nuevo → `assets/raw/hero-source.*`).
+- El workflow `.github/workflows/build.yml` ("Construir web") se dispara con ese commit: re-codifica el reel a all-intra con ffmpeg (runners de GitHub, gratis en repos públicos), ejecuta `node panel/build.js` (regenera `index.html` desde el contenido con los mismos renderizadores de `generate.js`) y commitea con `[skip ci]`. Pages redespliega solo. Total: 2-3 min.
+- Vista previa: en el navegador, sin publicar (mismo `generate.js` + iframe). Historial: los commits reales de `content.json`.
+- Límites de subida: reel 70 MB, clips 40 MB, imágenes 10 MB (el límite de blobs de la API es 100 MB).
+
+Convivencia: el panel local (abajo) sigue funcionando como plan B — publica `index.html` ya regenerado y el Action simplemente no encuentra nada que rehacer.
+
+## Modo panel local en el PC de Diego (plan B)
 
 La web vive en GitHub Pages (`https://piki2066.github.io/diego-visuals/`) y el panel corre en el ordenador de Diego. Al **Publicar**, el servidor local regenera `index.html` y lo sube al repo por la API de GitHub (sin Git instalado); Pages redespliega solo en ~1 minuto. Al **arrancar**, el panel baja de GitHub el `index.html` y `content.json` más recientes — si Alex publica diseño o contenido desde otra máquina, la copia de Diego lo adopta sola (gana la última publicación).
 
