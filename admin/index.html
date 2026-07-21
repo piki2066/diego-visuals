@@ -370,10 +370,7 @@ let baseline = '';     // último contenido publicado (JSON)
 const staged = new Map(); // ruta en el repo → File pendiente de publicar
 
 const $ = (id) => document.getElementById(id);
-const ytId = (url) => {
-  const m = String(url || '').match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{6,20})/);
-  return m ? m[1] : null;
-};
+// ytId llega como global desde ../panel/generate.js (no redeclarar: chocaría).
 
 function toast(msg, type = '') {
   const el = document.createElement('div');
