@@ -1,8 +1,8 @@
 CÓMO ACTUALIZAR TU WEB — DIEGO VISUALS
 ========================================
 
-Tu web:   https://piki2066.github.io/diego-visuals/
-Tu panel: https://piki2066.github.io/diego-visuals/admin/
+Tu web:   https://diego8visuals.com/
+Tu panel: https://diego8visuals.com/admin/
 
 1. Abre el panel desde cualquier navegador (ordenador o móvil).
 

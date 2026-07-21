@@ -34,7 +34,7 @@ Sin `ADMIN_PASSWORD` usa `diego2026` (solo para desarrollo).
 
 ## Panel web (el principal): 100 % en el navegador, sin instalar nada
 
-**Panel:** `https://piki2066.github.io/diego-visuals/admin/` · **Web:** `https://piki2066.github.io/diego-visuals/`
+**Panel:** `https://diego8visuals.com/admin/` · **Web:** `https://diego8visuals.com/`
 
 - `admin/index.html` es una página estática (Pages la sirve). Habla directamente con la API de GitHub desde el navegador; la "clave de acceso" de Diego es un **fine-grained PAT** limitado al repo (Contents: Read and write) que queda guardado en localStorage de su navegador — una vez por dispositivo.
 - Al **Publicar**, el navegador hace un commit con `panel/data/content.json` + los archivos subidos (fotos → `assets/uploads/`, reel nuevo → `assets/raw/hero-source.*`).
@@ -46,7 +46,7 @@ Convivencia: el panel local (abajo) sigue funcionando como plan B — publica `i
 
 ## Modo panel local en el PC de Diego (plan B)
 
-La web vive en GitHub Pages (`https://piki2066.github.io/diego-visuals/`) y el panel corre en el ordenador de Diego. Al **Publicar**, el servidor local regenera `index.html` y lo sube al repo por la API de GitHub (sin Git instalado); Pages redespliega solo en ~1 minuto. Al **arrancar**, el panel baja de GitHub el `index.html` y `content.json` más recientes — si Alex publica diseño o contenido desde otra máquina, la copia de Diego lo adopta sola (gana la última publicación).
+La web vive en GitHub Pages (`https://diego8visuals.com/`) y el panel corre en el ordenador de Diego. Al **Publicar**, el servidor local regenera `index.html` y lo sube al repo por la API de GitHub (sin Git instalado); Pages redespliega solo en ~1 minuto. Al **arrancar**, el panel baja de GitHub el `index.html` y `content.json` más recientes — si Alex publica diseño o contenido desde otra máquina, la copia de Diego lo adopta sola (gana la última publicación).
 
 Config en `panel/config.local.json` (**nunca** se sube al repo, está en .gitignore):
 
