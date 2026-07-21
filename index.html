@@ -413,6 +413,20 @@
         radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.18) 100%);
     }
 
+    /* Móvil vertical: el vídeo es 16:9 y a pantalla completa se recortaría
+       a un tercio del encuadre (cabeza gigante cortada). Se muestra como
+       banda panorámica centrada con bordes fundidos al fondo. */
+    @media (max-width: 768px) and (orientation: portrait) {
+      .hero-video-scrub {
+        top: 50%;
+        bottom: auto;
+        height: 48vh;
+        transform: translateY(-50%);
+        -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+        mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+      }
+    }
+
     .hero-overlay {
       position: relative;
       z-index: 2;
