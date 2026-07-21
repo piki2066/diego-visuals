@@ -36,9 +36,11 @@ jobs:
             src="${raws[0]}"
             echo "Re-codificando $src (cada frame keyframe, para el scroll-scrub)…"
             mkdir -p assets/video
-            ffmpeg -y -i "$src" -an -c:v libx264 -preset medium -crf 20 \
+            # 1280px/30fps/CRF24: all-intra dispara el bitrate; más resolución
+            # deja el vídeo tan pesado que en la web pública no llega a cargar.
+            ffmpeg -y -i "$src" -an -c:v libx264 -preset medium -crf 24 \
               -g 1 -keyint_min 1 -bf 0 -pix_fmt yuv420p \
-              -vf "scale=min(1920\,iw):-2" -movflags +faststart \
+              -vf "scale=min(1280\,iw):-2,fps=30" -movflags +faststart \
               assets/video/hero-scrub.mp4
             rm -f assets/raw/*
           else

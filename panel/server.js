@@ -42,7 +42,9 @@ function findFfmpeg() {
 const FFMPEG = findFfmpeg();
 
 // El scroll-scrub del hero busca frames constantemente: cada frame debe ser
-// keyframe (all-intra), si no el seeking va a saltos.
+// keyframe (all-intra), si no el seeking va a saltos. 1280px/30fps/CRF24:
+// all-intra dispara el bitrate, y por encima de esto el vídeo tarda tanto
+// en descargar que en la web pública "no carga" (36 MB para 8 s a 1080p).
 function encodeAllIntra(input, output) {
   return new Promise((resolve, reject) => {
     execFile(FFMPEG, [
@@ -50,10 +52,10 @@ function encodeAllIntra(input, output) {
       '-an',
       '-c:v', 'libx264',
       '-preset', 'medium',
-      '-crf', '20',
+      '-crf', '24',
       '-g', '1', '-keyint_min', '1', '-bf', '0',
       '-pix_fmt', 'yuv420p',
-      '-vf', 'scale=min(1920\\,iw):-2',
+      '-vf', 'scale=min(1280\\,iw):-2,fps=30',
       '-movflags', '+faststart',
       output,
     ], { timeout: 15 * 60 * 1000 }, (err, _out, stderr) => {

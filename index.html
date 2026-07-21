@@ -1501,7 +1501,7 @@
         <video
           class="hero-video-scrub"
           id="heroVideo"
-          src="assets/video/hero-scrub.mp4?v=4"
+          src="assets/video/hero-scrub.mp4?v=5"
           muted
           playsinline
           webkit-playsinline
@@ -2160,7 +2160,10 @@
           if (video.readyState < 1 || !isFinite(video.duration) || video.duration <= 0) return;
           duration = video.duration;
           ready = true;
-          spinner?.classList.add('hidden');
+          // El spinner no se va hasta que hay un frame pintable — si no,
+          // en conexiones lentas queda un hueco negro sin feedback.
+          if (video.readyState >= 2) spinner?.classList.add('hidden');
+          else video.addEventListener('loadeddata', () => spinner?.classList.add('hidden'), { once: true });
           measure();
           computeTarget();
           schedule();
