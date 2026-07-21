@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel · Diego Visuals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07080A;
+    --bg2: #12141A;
+    --bg3: #1A1D25;
+    --accent: #C3C7CF;
+    --accent-glow: #E4E8EF;
+    --accent-dim: #3D4149;
+    --text: #EEF0F3;
+    --text2: #A8ACB4;
+    --muted: #6A6E75;
+    --border: rgba(255,255,255,0.07);
+    --ok: #7FBF8E;
+    --warn: #D9B36C;
+    --bad: #C97070;
+    --display: 'Syne', sans-serif;
+    --body: 'DM Sans', sans-serif;
+    --mono: 'Space Mono', monospace;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { color-scheme: dark; }
+  body { background:var(--bg); color:var(--text); font-family:var(--body); min-height:100vh; }
+  button { font-family:var(--body); cursor:pointer; }
+  input, textarea, select { font-family:var(--body); }
+
+  /* ── Login ── */
+  .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem; }
+  .login-card { width:100%; max-width:380px; background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:2.2rem; }
+  .login-card h1 { font-family:var(--display); font-size:1.4rem; letter-spacing:0.02em; margin-bottom:0.4rem; }
+  .login-card p { color:var(--text2); font-size:0.9rem; margin-bottom:1.5rem; }
+  .login-error { color:var(--bad); font-size:0.85rem; margin-top:0.8rem; min-height:1.2em; }
+
+  /* ── Layout ── */
+  .app { display:none; }
+  .topbar { position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:0.7rem; flex-wrap:wrap;
+    padding:0.8rem 1.2rem; background:rgba(7,8,10,0.92); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+  .topbar .brand { font-family:var(--display); font-weight:700; font-size:1rem; letter-spacing:0.04em; margin-right:auto; }
+  .brand small { display:block; font-family:var(--mono); font-weight:400; font-size:0.62rem; color:var(--muted); letter-spacing:0.1em; }
+  .dirty-badge { display:none; font-family:var(--mono); font-size:0.65rem; color:var(--warn); border:1px solid rgba(217,179,108,0.35); padding:0.25rem 0.55rem; border-radius:99px; }
+  .dirty-badge.on { display:inline-block; }
+
+  .tabs { display:flex; gap:0.3rem; padding:0.7rem 1.2rem 0; overflow-x:auto; border-bottom:1px solid var(--border); scrollbar-width:none; }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tab { background:none; border:none; color:var(--text2); font-size:0.9rem; font-weight:500; padding:0.55rem 0.9rem;
+    border-bottom:2px solid transparent; white-space:nowrap; transition:color 0.2s; }
+  .tab:hover { color:var(--text); }
+  .tab.active { color:var(--text); border-bottom-color:var(--accent); }
+
+  main { max-width:820px; margin:0 auto; padding:1.6rem 1.2rem 6rem; }
+  .pane { display:none; }
+  .pane.active { display:block; animation:fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+  .hint { color:var(--muted); font-size:0.8rem; line-height:1.45; margin:0.35rem 0 0; }
+  .field { margin-bottom:1.1rem; }
+  .field label { display:block; font-size:0.8rem; font-weight:600; color:var(--text2); margin-bottom:0.4rem; letter-spacing:0.02em; }
+  input[type=text], input[type=number], input[type=email], input[type=url], input[type=password], textarea, select {
+    width:100%; background:var(--bg3); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:0.65rem 0.8rem; font-size:0.95rem; outline:none; transition:border-color 0.2s;
+  }
+  input:focus, textarea:focus, select:focus { border-color:var(--accent-dim); }
+  textarea { resize:vertical; min-height:70px; line-height:1.5; }
+  .row { display:flex; gap:0.8rem; }
+  .row > * { flex:1; }
+  .check { display:flex; align-items:center; gap:0.55rem; font-size:0.9rem; color:var(--text2); cursor:pointer; user-select:none; }
+  .check input { width:auto; accent-color:var(--accent); transform:scale(1.15); }
+
+  .card { background:var(--bg2); border:1px solid var(--border); border-radius:14px; padding:1.2rem; margin-bottom:1rem; }
+  .card-head { display:flex; align-items:center; gap:0.4rem; margin-bottom:0.9rem; }
+  .card-head .num { font-family:var(--mono); font-size:0.7rem; color:var(--muted); margin-right:auto; }
+  .icon-btn { background:var(--bg3); border:1px solid var(--border); color:var(--text2); border-radius:8px;
+    width:30px; height:30px; font-size:0.85rem; line-height:1; transition:all 0.15s; }
+  .icon-btn:hover { color:var(--text); border-color:var(--accent-dim); }
+  .icon-btn.del:hover { color:var(--bad); border-color:rgba(201,112,112,0.4); }
+  .icon-btn:disabled { opacity:0.3; cursor:default; }
+
+  .btn { display:inline-flex; align-items:center; gap:0.45rem; border-radius:10px; padding:0.6rem 1.1rem;
+    font-size:0.9rem; font-weight:600; border:1px solid var(--border); background:var(--bg3); color:var(--text); transition:all 0.15s; }
+  .btn:hover { border-color:var(--accent-dim); }
+  .btn.primary { background:var(--accent); color:#0B0C0F; border-color:var(--accent); }
+  .btn.primary:hover { background:var(--accent-glow); }
+  .btn.small { padding:0.45rem 0.8rem; font-size:0.82rem; }
+  .btn.ghost { background:none; }
+  .btn:disabled { opacity:0.5; cursor:default; }
+  .btn.block { width:100%; justify-content:center; }
+
+  .section-title { font-family:var(--display); font-size:1.15rem; font-weight:700; margin-bottom:0.3rem; }
+  .section-sub { color:var(--text2); font-size:0.88rem; margin-bottom:1.3rem; line-height:1.5; }
+
+  .thumb-preview { width:100%; max-width:280px; aspect-ratio:16/10; object-fit:cover; border-radius:10px; border:1px solid var(--border); display:block; margin-top:0.5rem; }
+  .file-note { font-family:var(--mono); font-size:0.7rem; color:var(--muted); word-break:break-all; margin-top:0.4rem; }
+  .upload-progress { display:none; height:5px; background:var(--bg3); border-radius:99px; overflow:hidden; margin-top:0.6rem; }
+  .upload-progress .bar { height:100%; width:0%; background:var(--accent); transition:width 0.15s; }
+
+  .actionbar { position:fixed; bottom:0; left:0; right:0; z-index:60; display:flex; gap:0.6rem; justify-content:flex-end;
+    padding:0.8rem 1.2rem; background:rgba(7,8,10,0.94); backdrop-filter:blur(12px); border-top:1px solid var(--border); }
+
+  /* ── Modales / toasts ── */
+  .modal-bg { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; padding:1.2rem; }
+  .modal-bg.open { display:flex; }
+  .modal { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:1.6rem; width:100%; max-width:520px; max-height:80vh; overflow-y:auto; }
+  .modal h2 { font-family:var(--display); font-size:1.1rem; margin-bottom:1rem; }
+  .modal .close-row { display:flex; justify-content:flex-end; margin-top:1.2rem; }
+  .backup-item { display:flex; align-items:center; justify-content:space-between; gap:0.8rem; padding:0.7rem 0; border-bottom:1px solid var(--border); font-size:0.9rem; }
+  .backup-item span { color:var(--text2); font-family:var(--mono); font-size:0.78rem; }
+  .help-block { margin-bottom:1.1rem; }
+  .help-block h3 { font-size:0.92rem; margin-bottom:0.3rem; }
+  .help-block p { color:var(--text2); font-size:0.87rem; line-height:1.55; }
+
+  #toasts { position:fixed; top:1rem; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:0.5rem; width:min(92vw, 420px); }
+  .toast { background:var(--bg3); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:10px;
+    padding:0.75rem 1rem; font-size:0.88rem; box-shadow:0 8px 30px rgba(0,0,0,0.5); animation:fadeIn 0.2s ease; }
+  .toast.ok { border-left-color:var(--ok); }
+  .toast.warn { border-left-color:var(--warn); }
+  .toast.bad { border-left-color:var(--bad); }
+
+  @media (max-width: 640px) {
+    .topbar { padding:0.7rem 0.9rem; }
+    main { padding:1.2rem 0.9rem 7rem; }
+    .row { flex-direction:column; gap:0; }
+    .actionbar { justify-content:stretch; }
+    .actionbar .btn { flex:1; justify-content:center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div class="login-wrap" id="loginView">
+  <form class="login-card" id="loginForm">
+    <h1>DIEGO VISUALS</h1>
+    <p>Panel de control de tu web. Escribe tu contraseña para entrar.</p>
+    <div class="field">
+      <label for="loginPass">Contraseña</label>
+      <input type="password" id="loginPass" autocomplete="current-password" required>
+    </div>
+    <button class="btn primary block" type="submit">Entrar</button>
+    <div class="login-error" id="loginError"></div>
+  </form>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div class="app" id="appView">
+  <div class="topbar">
+    <div class="brand">PANEL · DIEGO VISUALS<small>tu web, a tu manera</small></div>
+    <span class="dirty-badge" id="dirtyBadge">cambios sin publicar</span>
+    <button class="btn small ghost" id="btnHelp">Ayuda</button>
+    <button class="btn small ghost" id="btnHistory">Historial</button>
+    <button class="btn small ghost" id="btnSite">Ver mi web</button>
+    <button class="btn small ghost" id="btnLogout">Salir</button>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-pane="inicio">Portada</button>
+    <button class="tab" data-pane="stats">Números</button>
+    <button class="tab" data-pane="clients">Clientes</button>
+    <button class="tab" data-pane="projects">Trabajos</button>
+    <button class="tab" data-pane="testimonials">Reseñas</button>
+    <button class="tab" data-pane="contact">Textos y contacto</button>
+  </nav>
+
+  <main>
+    <!-- PORTADA -->
+    <section class="pane active" id="pane-inicio">
+      <h2 class="section-title">Portada</h2>
+      <p class="section-sub">Lo primero que ve la gente al entrar en tu web.</p>
+
+      <div class="card">
+        <div class="field">
+          <label class="check"><input type="checkbox" id="heroBadgeVisible"> Mostrar la etiqueta de disponibilidad</label>
+        </div>
+        <div class="field">
+          <label for="heroBadge">Texto de la etiqueta</label>
+          <input type="text" id="heroBadge" placeholder="Disponible para proyectos">
+        </div>
+        <div class="field">
+          <label for="heroTitle">Título grande (una línea por fila)</label>
+          <textarea id="heroTitle" rows="2" style="font-family:var(--mono); text-transform:uppercase;"></textarea>
+        </div>
+        <div class="field">
+          <label for="heroSubtitle">Subtítulo</label>
+          <input type="text" id="heroSubtitle" placeholder="Editor & Director Creativo">
+        </div>
+        <div class="field">
+          <label for="heroDescription">Descripción</label>
+          <textarea id="heroDescription" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><strong>Vídeo de portada (tu reel)</strong></div>
+        <p class="hint" style="margin:0 0 0.8rem;">Es el vídeo que se ve al hacer scroll al entrar. Sube tu mejor reel en mp4 (máx. 30 segundos recomendado). Al subirlo se procesa automáticamente para que el efecto de scroll vaya fluido — puede tardar unos minutos, no cierres la página.</p>
+        <div class="file-note" id="heroVideoNote"></div>
+        <div class="upload-progress" id="heroVideoProgress"><div class="bar"></div></div>
+        <input type="file" id="heroVideoFile" accept=".mp4,.mov,.webm" hidden>
+        <button class="btn small" id="btnHeroVideo" style="margin-top:0.7rem;">Subir nuevo vídeo</button>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><strong>Programas que usas</strong></div>
+        <div id="toolsList"></div>
+        <button class="btn small" id="btnAddTool">+ Añadir programa</button>
+        <p class="hint">Las letras cortas (Ae, Pr…) son las que se ven en los círculos de la portada.</p>
+      </div>
+    </section>
+
+    <!-- NÚMEROS -->
+    <section class="pane" id="pane-stats">
+      <h2 class="section-title">Números</h2>
+      <p class="section-sub">Las cifras que aparecen bajo la portada: proyectos, clientes, años… Pon números reales, que se nota.</p>
+      <div id="statsList"></div>
+    </section>
+
+    <!-- CLIENTES -->
+    <section class="pane" id="pane-clients">
+      <h2 class="section-title">Clientes</h2>
+      <p class="section-sub">La tira de clientes y colaboraciones que se mueve sola. Con nombre y una línea corta (p. ej. «FulanoYT · 500K subs»). La foto es opcional.</p>
+      <div id="clientsList"></div>
+      <button class="btn" id="btnAddClient">+ Añadir cliente</button>
+    </section>
+
+    <!-- TRABAJOS -->
+    <section class="pane" id="pane-projects">
+      <h2 class="section-title">Trabajos</h2>
+      <p class="section-sub">Tus proyectos. Pega el enlace de YouTube y la miniatura se pone sola. Si aún no está el vídeo, marca «Próximamente».</p>
+      <div id="projectsList"></div>
+      <button class="btn" id="btnAddProject">+ Añadir trabajo</button>
+    </section>
+
+    <!-- RESEÑAS -->
+    <section class="pane" id="pane-testimonials">
+      <h2 class="section-title">Reseñas</h2>
+      <p class="section-sub">Lo que dicen tus clientes de ti. Copia sus palabras tal cual — cuanto más natural, mejor.</p>
+      <div id="testimonialsList"></div>
+      <button class="btn" id="btnAddTestimonial">+ Añadir reseña</button>
+    </section>
+
+    <!-- TEXTOS Y CONTACTO -->
+    <section class="pane" id="pane-contact">
+      <h2 class="section-title">Textos y contacto</h2>
+      <p class="section-sub">Los textos de cada sección y tus datos de contacto.</p>
+
+      <div class="card">
+        <div class="card-head"><strong>Textos de las secciones</strong></div>
+        <div class="field">
+          <label for="descTrabajos">Texto bajo «Trabajos»</label>
+          <textarea id="descTrabajos" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label for="descTestimonios">Texto bajo «Lo que dicen mis clientes»</label>
+          <textarea id="descTestimonios" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label for="descContacto">Texto bajo «Trabajemos juntos»</label>
+          <textarea id="descContacto" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><strong>Contacto y redes</strong></div>
+        <div class="field">
+          <label for="contactEmail">Tu email</label>
+          <input type="email" id="contactEmail">
+        </div>
+        <div class="field">
+          <label for="contactX">Enlace a tu X / Twitter (déjalo vacío para ocultarlo)</label>
+          <input type="url" id="contactX" placeholder="https://x.com/tuusuario">
+        </div>
+        <div class="field">
+          <label for="contactIg">Enlace a tu Instagram (déjalo vacío para ocultarlo)</label>
+          <input type="url" id="contactIg" placeholder="https://instagram.com/tuusuario">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="actionbar">
+    <button class="btn" id="btnDiscard">Descartar cambios</button>
+    <button class="btn" id="btnPreview">Vista previa</button>
+    <button class="btn primary" id="btnPublish">Publicar cambios</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL HISTORIAL ═══ -->
+<div class="modal-bg" id="historyModal">
+  <div class="modal">
+    <h2>Historial de versiones</h2>
+    <p class="hint" style="margin-bottom:1rem;">Cada vez que publicas se guarda una copia. Si algo no te convence, restaura una versión anterior.</p>
+    <div id="backupsList"></div>
+    <div class="close-row"><button class="btn small" data-close="historyModal">Cerrar</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL AYUDA ═══ -->
+<div class="modal-bg" id="helpModal">
+  <div class="modal">
+    <h2>Cómo funciona el panel</h2>
+    <div class="help-block">
+      <h3>1. Cambia lo que quieras</h3>
+      <p>Muévete por las pestañas de arriba y edita textos, trabajos, reseñas… Nada cambia en tu web hasta que publiques.</p>
+    </div>
+    <div class="help-block">
+      <h3>2. Míralo antes con «Vista previa»</h3>
+      <p>Se abre tu web en una pestaña nueva con los cambios aplicados, solo visible para ti.</p>
+    </div>
+    <div class="help-block">
+      <h3>3. Publica</h3>
+      <p>Cuando estés contento, pulsa «Publicar cambios» y tu web se actualiza al momento.</p>
+    </div>
+    <div class="help-block">
+      <h3>Los trabajos van con YouTube</h3>
+      <p>Sube el vídeo a tu canal de YouTube, copia el enlace y pégalo en el trabajo. La miniatura se coge sola del propio YouTube.</p>
+    </div>
+    <div class="help-block">
+      <h3>¿La has liado?</h3>
+      <p>Tranquilo. En «Historial» tienes una copia de cada versión publicada. Restaura la que quieras.</p>
+    </div>
+    <div class="close-row"><button class="btn small" data-close="helpModal">Cerrar</button></div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+'use strict';
+
+// ─────────────────────────────────────────────
+// Estado
+// ─────────────────────────────────────────────
+let state = null;      // contenido en edición
+let baseline = '';     // JSON publicado (para saber si hay cambios)
+const DRAFT_KEY = 'panel-diego-draft';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const ytId = (url) => {
+  const m = String(url || '').match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{6,20})/);
+  return m ? m[1] : null;
+};
+
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  $('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 4200);
+}
+
+async function api(url, opts = {}) {
+  const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  if (res.status === 401) { showLogin(); throw new Error('sesión caducada'); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Error de conexión');
+  return data;
+}
+
+// ─────────────────────────────────────────────
+// Sesión
+// ─────────────────────────────────────────────
+function showLogin() {
+  $('loginView').style.display = 'flex';
+  $('appView').style.display = 'none';
+}
+function showApp() {
+  $('loginView').style.display = 'none';
+  $('appView').style.display = 'block';
+}
+
+$('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('loginError').textContent = '';
+  try {
+    await api('/api/login', { method: 'POST', body: JSON.stringify({ password: $('loginPass').value }) });
+    $('loginPass').value = '';
+    await boot();
+  } catch (err) {
+    $('loginError').textContent = err.message;
+  }
+});
+
+$('btnLogout').addEventListener('click', async () => {
+  try { await api('/api/logout', { method: 'POST' }); } catch (_) {}
+  showLogin();
+});
+
+// ─────────────────────────────────────────────
+// Carga inicial
+// ─────────────────────────────────────────────
+async function boot() {
+  const content = await api('/api/content');
+  baseline = JSON.stringify(content);
+  state = content;
+  const draft = localStorage.getItem(DRAFT_KEY);
+  if (draft && draft !== baseline) {
+    try {
+      state = JSON.parse(draft);
+      toast('Has recuperado cambios sin publicar de la última vez.', 'warn');
+    } catch (_) {
+      localStorage.removeItem(DRAFT_KEY);
+    }
+  }
+  renderAll();
+  markDirty();
+  showApp();
+  try {
+    const st = await api('/api/status');
+    if (!st.ffmpeg) toast('Aviso para Alex: ffmpeg no está disponible; el vídeo de portada no se procesará al subirlo.', 'warn');
+    if (st.github === false) toast('Aviso: la subida a internet no está configurada — los cambios solo se guardan en este ordenador. Avisa a Alex.', 'warn');
+  } catch (_) {}
+}
+
+function markDirty() {
+  const dirty = JSON.stringify(state) !== baseline;
+  $('dirtyBadge').classList.toggle('on', dirty);
+  return dirty;
+}
+
+let draftTimer = null;
+function touched() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => localStorage.setItem(DRAFT_KEY, JSON.stringify(state)), 400);
+  markDirty();
+}
+
+// ─────────────────────────────────────────────
+// Pestañas y modales
+// ─────────────────────────────────────────────
+$('tabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t === tab));
+  document.querySelectorAll('.pane').forEach((p) => p.classList.toggle('active', p.id === 'pane-' + tab.dataset.pane));
+});
+
+document.querySelectorAll('[data-close]').forEach((b) =>
+  b.addEventListener('click', () => $(b.dataset.close).classList.remove('open')));
+document.querySelectorAll('.modal-bg').forEach((m) =>
+  m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); }));
+
+$('btnHelp').addEventListener('click', () => $('helpModal').classList.add('open'));
+$('btnSite').addEventListener('click', () => window.open('/', '_blank'));
+
+// ─────────────────────────────────────────────
+// Render: campos sueltos
+// ─────────────────────────────────────────────
+function bindField(id, get, set) {
+  const el = $(id);
+  el.value = get() || '';
+  el.oninput = () => { set(el.value); touched(); };
+}
+
+function renderAll() {
+  // Portada
+  const h = state.hero;
+  $('heroBadgeVisible').checked = h.badgeVisible !== false;
+  $('heroBadgeVisible').onchange = (e) => { h.badgeVisible = e.target.checked; touched(); };
+  bindField('heroBadge', () => h.badge, (v) => h.badge = v);
+  $('heroTitle').value = (h.titleLines || []).join('\n');
+  $('heroTitle').oninput = () => {
+    h.titleLines = $('heroTitle').value.split('\n').map((s) => s.trim()).filter(Boolean).slice(0, 3);
+    touched();
+  };
+  bindField('heroSubtitle', () => h.subtitle, (v) => h.subtitle = v);
+  bindField('heroDescription', () => h.description, (v) => h.description = v);
+  $('heroVideoNote').textContent = 'Vídeo actual: ' + (h.videoSrc || 'ninguno');
+  renderTools();
+
+  renderStats();
+  renderClients();
+  renderProjects();
+  renderTestimonials();
+
+  // Textos y contacto
+  bindField('descTrabajos', () => state.sections.trabajosDesc, (v) => state.sections.trabajosDesc = v);
+  bindField('descTestimonios', () => state.sections.testimoniosDesc, (v) => state.sections.testimoniosDesc = v);
+  bindField('descContacto', () => state.sections.contactoDesc, (v) => state.sections.contactoDesc = v);
+  bindField('contactEmail', () => state.contact.email, (v) => state.contact.email = v);
+  bindField('contactX', () => state.contact.x, (v) => state.contact.x = v);
+  bindField('contactIg', () => state.contact.instagram, (v) => state.contact.instagram = v);
+}
+
+// ─────────────────────────────────────────────
+// Utilidades de listas
+// ─────────────────────────────────────────────
+function listControls(arr, i, rerender) {
+  const wrap = document.createElement('div');
+  wrap.className = 'card-head';
+  wrap.innerHTML = `<span class="num">#${i + 1}</span>`;
+  const mk = (label, title, fn, cls = '') => {
+    const b = document.createElement('button');
+    b.className = 'icon-btn ' + cls;
+    b.textContent = label;
+    b.title = title;
+    b.onclick = fn;
+    return b;
+  };
+  const up = mk('↑', 'Subir', () => { [arr[i-1], arr[i]] = [arr[i], arr[i-1]]; touched(); rerender(); });
+  const down = mk('↓', 'Bajar', () => { [arr[i+1], arr[i]] = [arr[i], arr[i+1]]; touched(); rerender(); });
+  up.disabled = i === 0;
+  down.disabled = i === arr.length - 1;
+  const del = mk('✕', 'Quitar', () => {
+    if (!confirm('¿Quitar este elemento? (No se aplica hasta que publiques)')) return;
+    arr.splice(i, 1); touched(); rerender();
+  }, 'del');
+  wrap.append(up, down, del);
+  return wrap;
+}
+
+function textInput(obj, key, placeholder = '') {
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.placeholder = placeholder;
+  inp.value = obj[key] || '';
+  inp.oninput = () => { obj[key] = inp.value; touched(); };
+  return inp;
+}
+
+function fieldWrap(labelText, control) {
+  const f = document.createElement('div');
+  f.className = 'field';
+  const l = document.createElement('label');
+  l.textContent = labelText;
+  f.append(l, control);
+  return f;
+}
+
+// ─────────────────────────────────────────────
+// Portada: programas
+// ─────────────────────────────────────────────
+function renderTools() {
+  const box = $('toolsList');
+  box.innerHTML = '';
+  state.hero.tools.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.marginBottom = '0.7rem';
+    const abbr = textInput(t, 'abbr', 'Ae');
+    abbr.maxLength = 4;
+    abbr.style.maxWidth = '90px';
+    abbr.style.flex = '0 0 90px';
+    const name = textInput(t, 'name', 'After Effects');
+    const del = document.createElement('button');
+    del.className = 'icon-btn del';
+    del.textContent = '✕';
+    del.style.flex = '0 0 30px';
+    del.onclick = () => { state.hero.tools.splice(i, 1); touched(); renderTools(); };
+    row.append(abbr, name, del);
+    box.appendChild(row);
+  });
+}
+$('btnAddTool').addEventListener('click', () => {
+  if (state.hero.tools.length >= 6) return toast('Máximo 6 programas', 'warn');
+  state.hero.tools.push({ abbr: '', name: '' });
+  touched(); renderTools();
+});
+
+// ─────────────────────────────────────────────
+// Números
+// ─────────────────────────────────────────────
+function renderStats() {
+  const box = $('statsList');
+  box.innerHTML = '';
+  state.stats.forEach((s) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const row = document.createElement('div');
+    row.className = 'row';
+    const val = document.createElement('input');
+    val.type = 'number';
+    val.min = 0;
+    val.value = s.value;
+    val.oninput = () => { s.value = parseInt(val.value, 10) || 0; touched(); };
+    const suf = document.createElement('input');
+    suf.type = 'text';
+    suf.maxLength = 6;
+    suf.value = s.suffix || '+';
+    suf.oninput = () => { s.suffix = suf.value || '+'; touched(); };
+    const lab = textInput(s, 'label', 'Proyectos');
+    row.append(
+      fieldWrap('Número', val),
+      fieldWrap('Detrás del número', suf),
+      fieldWrap('Qué es', lab)
+    );
+    card.appendChild(row);
+    const hint = document.createElement('p');
+    hint.className = 'hint';
+    hint.textContent = 'Se verá como: ' + s.value + (s.suffix || '+');
+    suf.addEventListener('input', () => hint.textContent = 'Se verá como: ' + val.value + (suf.value || '+'));
+    val.addEventListener('input', () => hint.textContent = 'Se verá como: ' + val.value + (suf.value || '+'));
+    card.appendChild(hint);
+    box.appendChild(card);
+  });
+}
+
+// ─────────────────────────────────────────────
+// Clientes
+// ─────────────────────────────────────────────
+function renderClients() {
+  const box = $('clientsList');
+  box.innerHTML = '';
+  state.clients.forEach((c, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.appendChild(listControls(state.clients, i, renderClients));
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.append(
+      fieldWrap('Nombre', textInput(c, 'name', 'Nombre del cliente')),
+      fieldWrap('Descripción corta', textInput(c, 'desc', 'Canal de gaming · 500K subs'))
+    );
+    card.appendChild(row);
+    card.appendChild(uploadControl({
+      label: c.photo ? 'Cambiar foto' : 'Subir foto (opcional)',
+      kind: 'photo',
+      accept: '.jpg,.jpeg,.png,.webp',
+      current: c.photo,
+      onDone: (p) => { c.photo = p; renderClients(); },
+      onClear: c.photo ? () => { c.photo = ''; touched(); renderClients(); } : null,
+    }));
+    box.appendChild(card);
+  });
+}
+$('btnAddClient').addEventListener('click', () => {
+  state.clients.push({ name: '', desc: '', photo: '' });
+  touched(); renderClients();
+  toast('Cliente añadido abajo del todo');
+});
+
+// ─────────────────────────────────────────────
+// Trabajos
+// ─────────────────────────────────────────────
+function renderProjects() {
+  const box = $('projectsList');
+  box.innerHTML = '';
+  state.projects.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.appendChild(listControls(state.projects, i, renderProjects));
+
+    card.appendChild(fieldWrap('Título', textInput(p, 'title', 'Highlight Reel 2026')));
+    card.appendChild(fieldWrap('Categoría', textInput(p, 'category', 'Edición comercial')));
+
+    const videoInput = textInput(p, 'video', 'https://youtu.be/…');
+    const videoField = fieldWrap('Enlace de YouTube', videoInput);
+    card.appendChild(videoField);
+
+    const thumbBox = document.createElement('div');
+    const renderThumb = () => {
+      thumbBox.innerHTML = '';
+      const id = ytId(p.video);
+      const src = p.thumb ? p.thumb : (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null);
+      if (src) {
+        const img = document.createElement('img');
+        img.className = 'thumb-preview';
+        img.src = src;
+        img.alt = 'Miniatura';
+        thumbBox.appendChild(img);
+        const note = document.createElement('p');
+        note.className = 'hint';
+        note.textContent = p.thumb ? 'Usando tu imagen subida.' : 'Miniatura cogida de YouTube automáticamente.';
+        thumbBox.appendChild(note);
+      } else if (!p.comingSoon) {
+        const note = document.createElement('p');
+        note.className = 'hint';
+        note.textContent = 'Pega un enlace de YouTube para ver la miniatura, o marca «Próximamente».';
+        thumbBox.appendChild(note);
+      }
+    };
+    videoInput.addEventListener('input', renderThumb);
+    card.appendChild(thumbBox);
+
+    const soon = document.createElement('label');
+    soon.className = 'check';
+    soon.style.margin = '0.8rem 0';
+    const soonCb = document.createElement('input');
+    soonCb.type = 'checkbox';
+    soonCb.checked = !!p.comingSoon;
+    soonCb.onchange = () => { p.comingSoon = soonCb.checked; touched(); renderThumb(); };
+    soon.append(soonCb, document.createTextNode(' Próximamente (se muestra sin vídeo)'));
+    card.appendChild(soon);
+
+    card.appendChild(uploadControl({
+      label: p.thumb ? 'Cambiar imagen propia' : 'Subir imagen propia (opcional)',
+      kind: 'thumb',
+      accept: '.jpg,.jpeg,.png,.webp',
+      onDone: (path) => { p.thumb = path; renderProjects(); },
+      onClear: p.thumb ? () => { p.thumb = ''; touched(); renderProjects(); } : null,
+    }));
+
+    card.appendChild(uploadControl({
+      label: p.preview ? 'Cambiar clip de hover' : 'Subir clip corto para el hover (opcional)',
+      kind: 'preview',
+      accept: '.mp4,.mov,.webm',
+      current: p.preview,
+      onDone: (path) => { p.preview = path; renderProjects(); },
+      onClear: p.preview ? () => { p.preview = ''; touched(); renderProjects(); } : null,
+      hint: 'Clip de 3–5 segundos sin sonido que se reproduce al pasar el ratón.',
+    }));
+
+    renderThumb();
+    box.appendChild(card);
+  });
+}
+$('btnAddProject').addEventListener('click', () => {
+  state.projects.push({ title: '', category: '', video: '', thumb: '', preview: '', comingSoon: false });
+  touched(); renderProjects();
+  toast('Trabajo añadido abajo del todo');
+});
+
+// ─────────────────────────────────────────────
+// Reseñas
+// ─────────────────────────────────────────────
+function renderTestimonials() {
+  const box = $('testimonialsList');
+  box.innerHTML = '';
+  state.testimonials.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.appendChild(listControls(state.testimonials, i, renderTestimonials));
+
+    const txt = document.createElement('textarea');
+    txt.rows = 2;
+    txt.value = t.text || '';
+    txt.placeholder = 'Lo que dijo tu cliente, con sus palabras.';
+    txt.oninput = () => { t.text = txt.value; touched(); };
+    card.appendChild(fieldWrap('Reseña', txt));
+
+    const row = document.createElement('div');
+    row.className = 'row';
+    const stars = document.createElement('select');
+    [5, 4, 3, 2, 1].forEach((n) => {
+      const o = document.createElement('option');
+      o.value = n;
+      o.textContent = '★'.repeat(n);
+      stars.appendChild(o);
+    });
+    stars.value = t.stars || 5;
+    stars.onchange = () => { t.stars = parseInt(stars.value, 10); touched(); };
+    row.append(
+      fieldWrap('Nombre', textInput(t, 'name', 'Nombre del cliente')),
+      fieldWrap('Quién es', textInput(t, 'role', 'Cliente')),
+      fieldWrap('Estrellas', stars)
+    );
+    card.appendChild(row);
+    box.appendChild(card);
+  });
+}
+$('btnAddTestimonial').addEventListener('click', () => {
+  state.testimonials.push({ text: '', name: '', role: 'Cliente', stars: 5 });
+  touched(); renderTestimonials();
+  toast('Reseña añadida abajo del todo');
+});
+
+// ─────────────────────────────────────────────
+// Subida de archivos
+// ─────────────────────────────────────────────
+function uploadControl({ label, kind, accept, current, onDone, onClear, hint }) {
+  const wrap = document.createElement('div');
+  wrap.style.marginTop = '0.6rem';
+  if (current) {
+    const note = document.createElement('div');
+    note.className = 'file-note';
+    note.textContent = 'Archivo: ' + current;
+    wrap.appendChild(note);
+  }
+  if (hint) {
+    const h = document.createElement('p');
+    h.className = 'hint';
+    h.textContent = hint;
+    wrap.appendChild(h);
+  }
+  const progress = document.createElement('div');
+  progress.className = 'upload-progress';
+  progress.innerHTML = '<div class="bar"></div>';
+
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = accept;
+  input.hidden = true;
+
+  const btn = document.createElement('button');
+  btn.className = 'btn small';
+  btn.style.marginTop = '0.5rem';
+  btn.textContent = label;
+  btn.onclick = () => input.click();
+
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
+    uploadFile(kind, file, progress, btn, (path) => { onDone(path); touched(); });
+  };
+
+  wrap.append(progress, input, btn);
+  if (onClear) {
+    const clear = document.createElement('button');
+    clear.className = 'btn small ghost';
+    clear.style.margin = '0.5rem 0 0 0.5rem';
+    clear.textContent = 'Quitar';
+    clear.onclick = onClear;
+    wrap.appendChild(clear);
+  }
+  return wrap;
+}
+
+function uploadFile(kind, file, progressEl, btn, onDone) {
+  const xhr = new XMLHttpRequest();
+  const form = new FormData();
+  form.append('file', file);
+  progressEl.style.display = 'block';
+  const bar = progressEl.querySelector('.bar');
+  const oldLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Subiendo…';
+
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) {
+      const pct = Math.round((e.loaded / e.total) * 100);
+      bar.style.width = pct + '%';
+      btn.textContent = pct < 100 ? `Subiendo… ${pct}%` : 'Procesando…';
+    }
+  };
+  xhr.onload = () => {
+    btn.disabled = false;
+    btn.textContent = oldLabel;
+    progressEl.style.display = 'none';
+    bar.style.width = '0%';
+    try {
+      const data = JSON.parse(xhr.responseText);
+      if (xhr.status === 401) { showLogin(); return; }
+      if (xhr.status !== 200 || !data.ok) {
+        toast(data.error || 'Error al subir el archivo', 'bad');
+        return;
+      }
+      if (kind === 'hero' && data.encoded === false) {
+        toast('Vídeo subido, pero sin procesar (falta ffmpeg en el servidor). El scroll puede ir a saltos — avisa a Alex.', 'warn');
+      } else {
+        toast('Archivo subido. Recuerda publicar para que se vea.', 'ok');
+      }
+      onDone(data.path);
+    } catch (_) {
+      toast('Error al subir el archivo', 'bad');
+    }
+  };
+  xhr.onerror = () => {
+    btn.disabled = false;
+    btn.textContent = oldLabel;
+    progressEl.style.display = 'none';
+    toast('Error de conexión al subir', 'bad');
+  };
+  xhr.open('POST', '/api/upload?kind=' + encodeURIComponent(kind));
+  xhr.send(form);
+}
+
+// Vídeo del hero (control fijo del HTML)
+$('btnHeroVideo').addEventListener('click', () => $('heroVideoFile').click());
+$('heroVideoFile').addEventListener('change', () => {
+  const file = $('heroVideoFile').files[0];
+  if (!file) return;
+  uploadFile('hero', file, $('heroVideoProgress'), $('btnHeroVideo'), (path) => {
+    state.hero.videoSrc = path;
+    state.hero.videoVersion = (state.hero.videoVersion || 1) + 1;
+    $('heroVideoNote').textContent = 'Vídeo actual: ' + path;
+    touched();
+  });
+});
+
+// ─────────────────────────────────────────────
+// Publicar / previsualizar / descartar
+// ─────────────────────────────────────────────
+$('btnPublish').addEventListener('click', async () => {
+  const btn = $('btnPublish');
+  btn.disabled = true;
+  btn.textContent = 'Publicando…';
+  try {
+    const resp = await api('/api/publish', { method: 'POST', body: JSON.stringify({ content: state }) });
+    baseline = JSON.stringify(state);
+    localStorage.removeItem(DRAFT_KEY);
+    markDirty();
+    if (resp.web === 'ok') toast('¡Publicado! Tu web ya está actualizada (tarda ~1 minuto en verse en internet).', 'ok');
+    else if (resp.web === 'error') toast(resp.webError, 'warn');
+    else toast('Publicado en este ordenador.', 'ok');
+  } catch (err) {
+    toast(err.message, 'bad');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Publicar cambios';
+});
+
+$('btnPreview').addEventListener('click', async () => {
+  try {
+    await api('/api/preview', { method: 'POST', body: JSON.stringify({ content: state }) });
+    window.open('/preview', '_blank');
+  } catch (err) {
+    toast(err.message, 'bad');
+  }
+});
+
+$('btnDiscard').addEventListener('click', async () => {
+  if (markDirty() && !confirm('¿Descartar todos los cambios sin publicar?')) return;
+  localStorage.removeItem(DRAFT_KEY);
+  state = JSON.parse(baseline);
+  renderAll();
+  markDirty();
+  toast('Cambios descartados. Estás viendo lo que hay publicado.');
+});
+
+// ─────────────────────────────────────────────
+// Historial
+// ─────────────────────────────────────────────
+$('btnHistory').addEventListener('click', async () => {
+  $('historyModal').classList.add('open');
+  const box = $('backupsList');
+  box.innerHTML = '<p class="hint">Cargando…</p>';
+  try {
+    const { backups } = await api('/api/backups');
+    if (!backups.length) {
+      box.innerHTML = '<p class="hint">Aún no hay versiones guardadas. Se crean cada vez que publicas.</p>';
+      return;
+    }
+    box.innerHTML = '';
+    backups.forEach((id) => {
+      const row = document.createElement('div');
+      row.className = 'backup-item';
+      const [date, time] = id.split('_');
+      const span = document.createElement('span');
+      span.textContent = `${date}  ${(time || '').replace(/-/g, ':')}`;
+      const btn = document.createElement('button');
+      btn.className = 'btn small';
+      btn.textContent = 'Restaurar';
+      btn.onclick = async () => {
+        if (!confirm('¿Volver a esta versión? Tu web se actualizará al momento.')) return;
+        try {
+          const data = await api('/api/restore', { method: 'POST', body: JSON.stringify({ id }) });
+          state = data.content;
+          baseline = JSON.stringify(state);
+          localStorage.removeItem(DRAFT_KEY);
+          renderAll();
+          markDirty();
+          $('historyModal').classList.remove('open');
+          if (data.web === 'error') toast(data.webError, 'warn');
+          else toast('Versión restaurada. Tu web ya está como antes.', 'ok');
+        } catch (err) {
+          toast(err.message, 'bad');
+        }
+      };
+      row.append(span, btn);
+      box.appendChild(row);
+    });
+  } catch (err) {
+    box.innerHTML = '<p class="hint">No se pudo cargar el historial.</p>';
+  }
+});
+
+// Aviso al salir con cambios sin publicar
+window.addEventListener('beforeunload', (e) => {
+  if (state && JSON.stringify(state) !== baseline) e.preventDefault();
+});
+
+// ─────────────────────────────────────────────
+// Arranque: ¿hay sesión?
+// ─────────────────────────────────────────────
+(async () => {
+  try {
+    await boot();
+  } catch (_) {
+    showLogin();
+  }
+})();
+</script>
+</body>
+</html>

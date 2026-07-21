@@ -1,0 +1,33 @@
+CÓMO ACTUALIZAR TU WEB — DIEGO VISUALS
+========================================
+
+1. Entra en la carpeta "diego-visuals" y haz doble click en:
+
+      EMPEZAR-PANEL.bat
+
+   La primera vez tarda unos minutos preparándose.
+   Se abrirá una ventana negra: DÉJALA ABIERTA mientras uses el panel.
+
+2. Se te abre el navegador con el panel. Escribe tu contraseña
+   (te la ha dado Alex).
+
+3. Cambia lo que quieras: trabajos, reseñas, clientes, números,
+   textos, tu reel de portada...
+
+   - "Vista previa"      → ves cómo quedaría, solo lo ves tú.
+   - "Publicar cambios"  → se sube a tu web de verdad.
+                           Tarda ~1 minuto en verse en internet.
+   - "Historial"         → si la lías, vuelves a una versión anterior.
+
+4. Cuando acabes, cierra la ventana negra. Listo.
+
+IMPORTANTE
+----------
+- Para publicar necesitas internet (los cambios viajan a tu web).
+- Los trabajos van con enlaces de YouTube: sube el vídeo a tu canal,
+  copia el enlace y pégalo en el trabajo. La miniatura se pone sola.
+- El reel de portada se procesa solo al subirlo; puede tardar unos
+  minutos, no cierres nada mientras.
+
+Tu web: https://piki2066.github.io/diego-visuals/
+¿Algo no va? Llama a Alex.

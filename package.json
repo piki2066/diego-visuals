@@ -1,0 +1,13 @@
+{
+  "name": "diego-visuals-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfolio de Diego Visuals + panel de control (el servidor vive en panel/)",
+  "scripts": {
+    "postinstall": "cd panel && npm install --omit=dev",
+    "start": "node panel/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

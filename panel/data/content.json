@@ -1,0 +1,146 @@
+{
+  "hero": {
+    "badge": "Disponible para proyectos",
+    "badgeVisible": true,
+    "titleLines": [
+      "DIEGO",
+      "VISUALS"
+    ],
+    "subtitle": "Editor & Director Creativo",
+    "description": "Creando visuales de alto impacto que cuentan historias, conectan audiencias y elevan marcas al siguiente nivel.",
+    "tools": [
+      {
+        "abbr": "Ae",
+        "name": "After Effects"
+      },
+      {
+        "abbr": "Pr",
+        "name": "Premiere Pro"
+      },
+      {
+        "abbr": "Ps",
+        "name": "Photoshop"
+      }
+    ],
+    "videoSrc": "assets/video/hero-scrub.mp4",
+    "videoVersion": 4
+  },
+  "stats": [
+    {
+      "value": 50,
+      "suffix": "+",
+      "label": "Proyectos"
+    },
+    {
+      "value": 30,
+      "suffix": "+",
+      "label": "Clientes"
+    },
+    {
+      "value": 3,
+      "suffix": "+",
+      "label": "Años de exp."
+    },
+    {
+      "value": 1,
+      "suffix": "M+",
+      "label": "Visualizaciones"
+    }
+  ],
+  "clients": [
+    {
+      "name": "Cliente Uno",
+      "desc": "Descripción",
+      "photo": ""
+    },
+    {
+      "name": "Cliente Dos",
+      "desc": "Descripción",
+      "photo": ""
+    },
+    {
+      "name": "Cliente Tres",
+      "desc": "Descripción",
+      "photo": ""
+    },
+    {
+      "name": "Cliente Cuatro",
+      "desc": "Descripción",
+      "photo": ""
+    },
+    {
+      "name": "Cliente Cinco",
+      "desc": "Descripción",
+      "photo": ""
+    },
+    {
+      "name": "Cliente Seis",
+      "desc": "Descripción",
+      "photo": ""
+    }
+  ],
+  "projects": [
+    {
+      "title": "Estudio profesional",
+      "category": "Producción de vídeo",
+      "video": "https://youtu.be/fZRxdByj74k",
+      "thumb": "",
+      "preview": "",
+      "comingSoon": false
+    },
+    {
+      "title": "Motion graphics y diseño de sonido",
+      "category": "Motion graphics · Sonido",
+      "video": "",
+      "thumb": "",
+      "preview": "",
+      "comingSoon": true
+    },
+    {
+      "title": "Gameplay stream",
+      "category": "Edición de gaming",
+      "video": "https://youtu.be/JwpSSpf3_kw",
+      "thumb": "",
+      "preview": "",
+      "comingSoon": false
+    },
+    {
+      "title": "Vlog",
+      "category": "Edición de vlog",
+      "video": "https://youtu.be/UO5wFyHaMuU",
+      "thumb": "",
+      "preview": "",
+      "comingSoon": false
+    }
+  ],
+  "testimonials": [
+    {
+      "text": "Eres un crack, Diego. Nos encantó.",
+      "name": "Equipo Rivers",
+      "role": "Cliente",
+      "stars": 5
+    },
+    {
+      "text": "Eres un máquina, me gusta que te sigas superando.",
+      "name": "Edu Serrano",
+      "role": "Cliente",
+      "stars": 5
+    },
+    {
+      "text": "Le estás metiendo muy duro, está muy guapo en el apartado vídeo.",
+      "name": "Jcorko",
+      "role": "Cliente",
+      "stars": 5
+    }
+  ],
+  "sections": {
+    "trabajosDesc": "Una selección de mis mejores proyectos. Haz click para ver el video completo.",
+    "testimoniosDesc": "La satisfacción de mis clientes es mi mejor carta de presentación.",
+    "contactoDesc": "¿Tienes un proyecto en mente? Escríbeme y hablemos sobre cómo puedo ayudarte."
+  },
+  "contact": {
+    "email": "diego8visuals@gmail.com",
+    "x": "https://x.com/diego8visuals",
+    "instagram": "https://instagram.com/diego8visuals"
+  }
+}

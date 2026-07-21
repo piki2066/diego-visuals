@@ -1,0 +1,77 @@
+*** ACTUALIZACIÓN ***
+Ya no hace falta mover archivos a mano: ahora hay un panel de
+control en /admin desde el que puedes cambiar tú mismo los trabajos,
+reseñas, clientes, números, textos y el vídeo de portada.
+Lo de abajo se queda solo como referencia de la estructura.
+*********************
+
+ESTRUCTURA DE ARCHIVOS PARA EL PORTFOLIO
+==========================================
+
+Diego, mete tus archivos en estas carpetas:
+
+
+1. VIDEO PRINCIPAL (showreel/reel)
+-----------------------------------
+   Carpeta: assets/video/
+   Archivo: reel.mp4
+   - Tu mejor reel o showreel
+   - Aparece de fondo en el hero de la web
+   - Recomendado: 1080p, max 30s, comprimido (< 15MB)
+
+
+2. THUMBNAILS DE PROYECTOS
+-----------------------------------
+   Carpeta: assets/img/projects/
+   Archivos:
+     - proyecto1.jpg
+     - proyecto2.jpg
+     - proyecto3.jpg
+     - proyecto4.jpg
+     - proyecto5.jpg
+     - proyecto6.jpg
+   - Formato: JPG o WebP
+   - Tamaño recomendado: 1280x800px (ratio 16:10)
+   - Son las imágenes que se ven en la sección "Trabajos"
+
+
+3. VIDEOS PREVIEW DE PROYECTOS (opcionales)
+-----------------------------------
+   Carpeta: assets/video/previews/
+   Archivos:
+     - preview1.mp4
+     - preview2.mp4
+     - preview3.mp4
+     - preview4.mp4
+     - preview5.mp4
+     - preview6.mp4
+   - Clips cortos (3-5 segundos) que se ven al pasar el mouse
+   - Sin audio, comprimidos (< 3MB cada uno)
+
+
+4. FOTOS DE CLIENTES (opcionales)
+-----------------------------------
+   Carpeta: assets/img/clients/
+   Archivos:
+     - cliente1.jpg
+     - cliente2.jpg
+     - etc.
+   - Fotos de perfil de tus clientes
+   - Formato cuadrado recomendado (200x200px)
+
+
+5. TU FOTO DE PERFIL
+-----------------------------------
+   Carpeta: assets/img/
+   Archivo: perfil.jpg
+   - Tu foto para el logo de la nav
+   - Formato cuadrado (200x200px)
+
+
+6. DATOS QUE NECESITO QUE ME PASES POR TEXTO:
+-----------------------------------
+   - Nombre de cada proyecto + categoría (ej: "Highlight Reel 2026 - Edición Comercial")
+   - Links de YouTube de cada proyecto (para el lightbox)
+   - Nombres de clientes + descripción corta (ej: "FulanoYT - 500K subs")
+   - 3 testimonios de clientes (texto + nombre + rol)
+   - Números reales para las stats (proyectos, clientes, años, views)
