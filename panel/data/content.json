@@ -16,10 +16,6 @@
       {
         "abbr": "Pr",
         "name": "Premiere Pro"
-      },
-      {
-        "abbr": "Ps",
-        "name": "Photoshop"
       }
     ],
     "videoSrc": "assets/video/hero-scrub.mp4",
@@ -32,7 +28,7 @@
       "label": "Proyectos"
     },
     {
-      "value": 30,
+      "value": 10,
       "suffix": "+",
       "label": "Clientes"
     },
@@ -42,40 +38,25 @@
       "label": "Años de exp."
     },
     {
-      "value": 1,
+      "value": 2,
       "suffix": "M+",
       "label": "Visualizaciones"
     }
   ],
   "clients": [
     {
-      "name": "Cliente Uno",
-      "desc": "Descripción",
+      "name": "RIvers",
+      "desc": "4,55 M Suscriptores",
       "photo": ""
     },
     {
-      "name": "Cliente Dos",
-      "desc": "Descripción",
+      "name": "Jcorko",
+      "desc": "255 K Suscriptores",
       "photo": ""
     },
     {
-      "name": "Cliente Tres",
-      "desc": "Descripción",
-      "photo": ""
-    },
-    {
-      "name": "Cliente Cuatro",
-      "desc": "Descripción",
-      "photo": ""
-    },
-    {
-      "name": "Cliente Cinco",
-      "desc": "Descripción",
-      "photo": ""
-    },
-    {
-      "name": "Cliente Seis",
-      "desc": "Descripción",
+      "name": "Edu Serrano",
+      "desc": "130 K Suscriptores",
       "photo": ""
     }
   ],
@@ -91,14 +72,14 @@
     {
       "title": "Motion graphics y diseño de sonido",
       "category": "Motion graphics · Sonido",
-      "video": "",
+      "video": "https://youtu.be/cfC-YyA9rYo?si=GNIY91uBfp_aIOPZ",
       "thumb": "",
       "preview": "",
-      "comingSoon": true
+      "comingSoon": false
     },
     {
-      "title": "Gameplay stream",
-      "category": "Edición de gaming",
+      "title": "Gameplay multistream",
+      "category": "Gameplay",
       "video": "https://youtu.be/JwpSSpf3_kw",
       "thumb": "",
       "preview": "",
@@ -106,7 +87,7 @@
     },
     {
       "title": "Vlog",
-      "category": "Edición de vlog",
+      "category": "Edición estilo vlog",
       "video": "https://youtu.be/UO5wFyHaMuU",
       "thumb": "",
       "preview": "",
@@ -127,7 +108,7 @@
       "stars": 5
     },
     {
-      "text": "Le estás metiendo muy duro, está muy guapo en el apartado vídeo.",
+      "text": "Le estás metiendo muy duro, está muy guapo.",
       "name": "Jcorko",
       "role": "Cliente",
       "stars": 5
