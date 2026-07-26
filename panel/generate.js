@@ -73,6 +73,10 @@ function normalizeContent(raw) {
       tools: list(hero.tools, 6).map((t) => ({ abbr: str(t && t.abbr, 4), name: str(t && t.name, 40) })).filter((t) => t.abbr),
       videoSrc: safeUrl(hero.videoSrc) || 'assets/video/hero-scrub.mp4',
       videoVersion: clampInt(hero.videoVersion, 1, 1e9, 1),
+      // Máster vertical opcional para móvil en vertical (9:16). Si no hay,
+      // el móvil sigue usando el horizontal recortado como banda.
+      videoSrcVertical: safeUrl(hero.videoSrcVertical),
+      videoVersionVertical: clampInt(hero.videoVersionVertical, 1, 1e9, 1),
     },
     stats: list(c.stats, 6).map((s) => ({
       value: clampInt(s && s.value, 0, 999999999, 0),
@@ -115,18 +119,31 @@ function normalizeContent(raw) {
 
 function renderHeroVideo(c) {
   const src = `${esc(c.hero.videoSrc)}?v=${c.hero.videoVersion}`;
-  return [
+  const vert = c.hero.videoSrcVertical
+    ? `${esc(c.hero.videoSrcVertical)}?v=${c.hero.videoVersionVertical}`
+    : '';
+  // Dos másters: el navegador elige por media query al cargar (sin descargar
+  // los dos) y el JS del scrub reajusta si se gira el móvil. Los data-* son
+  // los que consulta ese JS.
+  const out = [
     '<video',
     '          class="hero-video-scrub"',
     '          id="heroVideo"',
-    `          src="${src}"`,
     '          muted',
     '          playsinline',
     '          webkit-playsinline',
     '          preload="auto"',
     '          aria-hidden="true"',
-    '        ></video>',
-  ].join('\n');
+    `          data-src-horizontal="${src}"`,
+  ];
+  if (vert) out.push(`          data-src-vertical="${vert}"`);
+  out.push('        >');
+  if (vert) {
+    out.push(`          <source src="${vert}" type="video/mp4" media="(max-width: 600px) and (orientation: portrait)">`);
+  }
+  out.push(`          <source src="${src}" type="video/mp4">`);
+  out.push('        </video>');
+  return out.join('\n');
 }
 
 function renderHero(c) {

@@ -89,10 +89,17 @@
 
     .preloader-logo {
       font-family: var(--font-display);
-      font-size: clamp(2rem, 6vw, 4rem);
+      /* Cada letra es un <span> suelto, así que el navegador puede partir
+         entre dos cualesquiera: en móvil "DIEGO VISUALS" en Syne 800 medía
+         más que la pantalla y la "S" caía a la línea de abajo. Con nowrap no
+         puede partirse, y el tamaño escala con el ancho para que quepa. */
+      font-size: clamp(1.2rem, 6.5vw, 4rem);
       font-weight: 800;
       letter-spacing: -0.04em;
       overflow: hidden;
+      white-space: nowrap;
+      padding: 0 1rem;
+      max-width: 100%;
     }
 
     .preloader-logo .p-char {
@@ -466,6 +473,28 @@
         -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
         mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
       }
+    }
+
+    /* Si el que ha cargado es el máster vertical (lo marca el JS mirando las
+       dimensiones reales del vídeo, no la media query), la banda se sustituye
+       por el encuadre 9:16 entero, a todo el ancho.
+       Los móviles de hoy son MÁS alargados que 9:16 (390x844 = 0,46 frente a
+       0,5625), así que a pantalla completa se comerían los lados: se llevaban
+       por delante las orejas y la cruz del logo. Con la caja atada al 9:16 se
+       ve el encuadre completo y ocupa ~82 % del alto. */
+    .hero-video-scrub.is-vertical {
+      top: 50%;
+      bottom: auto;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 9 / 16;
+      max-height: 100%;
+      object-fit: contain;
+      transform: translateY(-50%);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 5%, #000 95%, transparent 100%);
+      mask-image: linear-gradient(180deg, transparent 0, #000 5%, #000 95%, transparent 100%);
     }
 
     .hero-overlay {
@@ -922,17 +951,22 @@
     .client-info span { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
 
     /* ─── Stats ─── */
+    /* Rejilla, no flex: los números van subiendo (0 → 50+) y al cambiar de
+       ancho la fila se re-repartía y los items saltaban de renglón. Con
+       columnas fijas el texto puede crecer sin mover nada. */
     .stats {
-      display: flex;
-      justify-content: center;
-      gap: 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 3rem 1rem;
       padding: 5rem 2rem;
       max-width: 900px;
       margin: 0 auto;
-      flex-wrap: wrap;
     }
 
-    .stat-item { text-align: center; }
+    /* Ocupa la columna entera: si la caja se ajustase al texto, al crecer el
+       número se movería el borde. Así lo único que cambia es el texto, y va
+       centrado. */
+    .stat-item { text-align: center; width: 100%; }
 
     .stat-number {
       font-family: var(--font-display);
@@ -942,6 +976,9 @@
       line-height: 1;
       margin-bottom: 0.5rem;
       position: relative;
+      /* Cifras de ancho fijo: si no, cada número que sube da un tironcito. */
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum' 1;
     }
 
     .stat-number::after {
@@ -1446,7 +1483,7 @@
       .hero-actions { flex-direction: column; align-items: center; }
       .portfolio-grid { grid-template-columns: 1fr; }
       .cta-links { flex-direction: column; align-items: center; }
-      .stats { gap: 2rem; }
+      .stats { gap: 2.5rem 0.75rem; padding: 4rem 1.25rem; }
       .testimonials-grid { grid-template-columns: 1fr; }
       footer { flex-direction: column; text-align: center; }
     }
@@ -1624,13 +1661,17 @@
         <video
           class="hero-video-scrub"
           id="heroVideo"
-          src="assets/video/hero-scrub.mp4?v=5"
           muted
           playsinline
           webkit-playsinline
           preload="auto"
           aria-hidden="true"
-        ></video>
+          data-src-horizontal="assets/video/hero-scrub.mp4?v=5"
+          data-src-vertical="assets/video/hero-scrub-vertical.mp4?v=1"
+        >
+          <source src="assets/video/hero-scrub-vertical.mp4?v=1" type="video/mp4" media="(max-width: 600px) and (orientation: portrait)">
+          <source src="assets/video/hero-scrub.mp4?v=5" type="video/mp4">
+        </video>
         <!-- /ADMIN:HERO_VIDEO -->
         <div class="hero-vignette"></div>
         <div class="hero-scrim" id="heroScrim"></div>
@@ -2129,7 +2170,9 @@
             const progress = Math.min(elapsed / duration, 1);
             const eased = 1 - Math.pow(1 - progress, 3);
             const current = Math.round(eased * target);
-            el.textContent = current + (progress >= 1 ? suffix : '');
+            // El sufijo va desde el principio: si aparecía sólo al acabar,
+            // el texto cambiaba de ancho de golpe en el último frame.
+            el.textContent = current + suffix;
             if (progress < 1) requestAnimationFrame(updateCounter);
           }
           requestAnimationFrame(updateCounter);
@@ -2291,6 +2334,9 @@
         if (reduceMotion) {
           const showFirstFrame = () => {
             try { video.currentTime = 0; } catch (_) {}
+            if (video.videoWidth && video.videoHeight) {
+              video.classList.toggle('is-vertical', video.videoHeight > video.videoWidth);
+            }
             spinner?.classList.add('hidden');
           };
           if (video.readyState >= 1) showFirstFrame();
@@ -2359,7 +2405,40 @@
           if (rafId == null) rafId = requestAnimationFrame(tick);
         }
 
+        // ── Máster horizontal vs vertical ──
+        // El navegador elige por la media query del <source>. Aquí sólo se
+        // comprueba QUÉ ha cargado de verdad (por sus dimensiones) para
+        // decidir si va a pantalla completa o como banda.
+        function marcarOrientacion() {
+          if (!video.videoWidth || !video.videoHeight) return;
+          video.classList.toggle('is-vertical', video.videoHeight > video.videoWidth);
+        }
+
+        function fuenteQueTocaAhora() {
+          const vertical   = video.dataset.srcVertical;
+          const horizontal = video.dataset.srcHorizontal;
+          if (!vertical || !horizontal) return null;
+          // Mismo umbral que el media del <source> en panel/generate.js.
+          return matchMedia('(max-width: 600px) and (orientation: portrait)').matches
+            ? vertical : horizontal;
+        }
+
+        // Al girar el móvil el navegador no reevalúa los <source>: si el que
+        // está cargado ya no es el que toca, se cambia a mano.
+        function revisarFuente() {
+          const toca = fuenteQueTocaAhora();
+          if (!toca) return;
+          const archivo = toca.split('?')[0].split('/').pop();
+          const actual  = video.currentSrc || video.src || '';
+          if (!actual || actual.indexOf(archivo) !== -1) return;
+          ready = false;
+          duration = 0;
+          video.src = toca;
+          try { video.load(); } catch (_) {}
+        }
+
         function onReady() {
+          marcarOrientacion();
           if (ready) return;
           // HAVE_METADATA (>=1) ya permite setear currentTime.
           if (video.readyState < 1 || !isFinite(video.duration) || video.duration <= 0) return;
@@ -2439,10 +2518,15 @@
         window.addEventListener('resize', () => {
           clearTimeout(resizeTimer);
           resizeTimer = setTimeout(() => {
+            revisarFuente();
             measure();
             computeTarget();
             schedule();
           }, 80);
+        });
+
+        window.addEventListener('orientationchange', () => {
+          setTimeout(() => { revisarFuente(); measure(); computeTarget(); schedule(); }, 250);
         });
 
         document.addEventListener('visibilitychange', () => {

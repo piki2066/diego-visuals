@@ -19,7 +19,9 @@
       }
     ],
     "videoSrc": "assets/video/hero-scrub.mp4",
-    "videoVersion": 5
+    "videoVersion": 5,
+    "videoSrcVertical": "assets/video/hero-scrub-vertical.mp4",
+    "videoVersionVertical": 1
   },
   "stats": [
     {

@@ -218,6 +218,15 @@
       </div>
 
       <div class="card">
+        <div class="card-head"><strong>Vídeo de portada para móvil (vertical)</strong></div>
+        <p class="hint" style="margin:0 0 0.8rem;">Opcional. La misma animación exportada en vertical (9:16): en el móvil se ve a pantalla completa en vez de recortada. Tiene que durar <strong>lo mismo</strong> que el horizontal, empezar y acabar igual — la web sincroniza el scroll con el segundo del vídeo. Si no subes ninguno, el móvil usa el horizontal.</p>
+        <div class="file-note" id="heroVerticalNote"></div>
+        <div class="staged-note" id="heroVerticalStaged"></div>
+        <input type="file" id="heroVerticalFile" accept=".mp4,.mov,.webm" hidden>
+        <button class="btn small" id="btnHeroVertical" style="margin-top:0.7rem;">Subir vídeo vertical</button>
+      </div>
+
+      <div class="card">
         <div class="card-head"><strong>Programas que usas</strong></div>
         <div id="toolsList"></div>
         <button class="btn small" id="btnAddTool">+ Añadir programa</button>
@@ -540,11 +549,18 @@ function renderAll() {
   bindField('contactIg', () => state.contact.instagram, (v) => state.contact.instagram = v);
 }
 
+function pendienteHero(raiz) {
+  return [...staged.keys()].find((k) => k === `${raiz}.mp4` || k === `${raiz}.mov` || k === `${raiz}.webm`);
+}
+
 function renderHeroVideoNotes() {
   $('heroVideoNote').textContent = 'Vídeo actual: ' + (state.hero.videoSrc || 'ninguno');
-  const rawKey = [...staged.keys()].find((k) => k.startsWith('assets/raw/hero-source'));
-  $('heroVideoStaged').textContent = rawKey
+  $('heroVideoStaged').textContent = pendienteHero('assets/raw/hero-source')
     ? 'Nuevo vídeo listo — se subirá y procesará al darle a Publicar.'
+    : '';
+  $('heroVerticalNote').textContent = 'Vídeo vertical actual: ' + (state.hero.videoSrcVertical || 'ninguno');
+  $('heroVerticalStaged').textContent = pendienteHero('assets/raw/hero-source-vertical')
+    ? 'Nuevo vídeo vertical listo — se subirá y procesará al darle a Publicar.'
     : '';
 }
 
@@ -598,6 +614,7 @@ function fieldWrap(labelText, control) {
 // ─────────────────────────────────────────────
 const KINDS = {
   hero:    { exts: ['.mp4', '.mov', '.webm'], maxMB: 70,  label: 'vídeo' },
+  heroVertical: { exts: ['.mp4', '.mov', '.webm'], maxMB: 70, label: 'vídeo vertical' },
   preview: { exts: ['.mp4', '.mov', '.webm'], maxMB: 40,  label: 'clip' },
   thumb:   { exts: ['.jpg', '.jpeg', '.png', '.webp'], maxMB: 10, label: 'imagen' },
   photo:   { exts: ['.jpg', '.jpeg', '.png', '.webp'], maxMB: 10, label: 'foto' },
@@ -614,11 +631,15 @@ function stageFile(kind, file) {
     toast(`El ${spec.label} pesa demasiado (máximo ${spec.maxMB} MB)`, 'bad');
     return null;
   }
-  const path = kind === 'hero'
-    ? `assets/raw/hero-source${ext}`
-    : `assets/uploads/${kind}-${Date.now()}${ext}`;
-  if (kind === 'hero') {
-    for (const k of [...staged.keys()]) if (k.startsWith('assets/raw/hero-source')) staged.delete(k);
+  const RAIZ_HERO = { hero: 'assets/raw/hero-source', heroVertical: 'assets/raw/hero-source-vertical' };
+  const raiz = RAIZ_HERO[kind];
+  const path = raiz ? `${raiz}${ext}` : `assets/uploads/${kind}-${Date.now()}${ext}`;
+  if (raiz) {
+    // Ojo: "hero-source" es prefijo de "hero-source-vertical". Sólo se
+    // descartan los pendientes de ESTE vídeo, no los del otro.
+    for (const k of [...staged.keys()]) {
+      if (k === `${raiz}.mp4` || k === `${raiz}.mov` || k === `${raiz}.webm`) staged.delete(k);
+    }
   }
   staged.set(path, file);
   markDirty();
@@ -695,6 +716,21 @@ $('heroVideoFile').addEventListener('change', () => {
     toast('Vídeo preparado. Dale a Publicar para subirlo — se procesa solo en 2-3 minutos.', 'ok');
   }
   $('heroVideoFile').value = '';
+});
+
+$('btnHeroVertical').addEventListener('click', () => $('heroVerticalFile').click());
+$('heroVerticalFile').addEventListener('change', () => {
+  const file = $('heroVerticalFile').files[0];
+  if (!file) return;
+  const path = stageFile('heroVertical', file);
+  if (path) {
+    state.hero.videoSrcVertical = 'assets/video/hero-scrub-vertical.mp4';
+    state.hero.videoVersionVertical = (state.hero.videoVersionVertical || 1) + 1;
+    touched();
+    renderHeroVideoNotes();
+    toast('Vídeo vertical preparado. Dale a Publicar — se procesa solo en 2-3 minutos.', 'ok');
+  }
+  $('heroVerticalFile').value = '';
 });
 
 // ─────────────────────────────────────────────
@@ -929,8 +965,10 @@ function contentForPreview() {
   const swap = (v) => (v && staged.has(v) ? stagedUrl(v) : v);
   clone.clients.forEach((c) => { c.photo = swap(c.photo); });
   clone.projects.forEach((p) => { p.thumb = swap(p.thumb); p.preview = swap(p.preview); });
-  const rawKey = [...staged.keys()].find((k) => k.startsWith('assets/raw/hero-source'));
-  if (rawKey) clone.hero.videoSrc = stagedUrl(rawKey);
+  const rawH = pendienteHero('assets/raw/hero-source');
+  if (rawH) clone.hero.videoSrc = stagedUrl(rawH);
+  const rawV = pendienteHero('assets/raw/hero-source-vertical');
+  if (rawV) clone.hero.videoSrcVertical = stagedUrl(rawV);
   return clone;
 }
 
