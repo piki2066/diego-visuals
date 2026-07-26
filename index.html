@@ -412,6 +412,10 @@
       max-width: 100%;
       height: 300vh;
       overflow: visible;
+      /* El hero es un <section> y heredaba "padding: 6rem 2rem", así que el
+         vídeo quedaba con 32 px de barra negra a los lados (en móvil parecía
+         un recorte pegado encima). Va a sangre. */
+      padding: 0;
     }
 
     .hero-pin {
@@ -450,15 +454,17 @@
 
     /* Móvil vertical: el vídeo es 16:9 y a pantalla completa se recortaría
        a un tercio del encuadre (cabeza gigante cortada). Se muestra como
-       banda panorámica centrada con bordes fundidos al fondo. */
+       banda panorámica centrada, ya a todo el ancho y más alta, con los
+       bordes fundidos al fondo para que no parezca una foto pegada.
+       Con un máster 9:16 esto se sustituye por vídeo a pantalla completa. */
     @media (max-width: 768px) and (orientation: portrait) {
       .hero-video-scrub {
         top: 50%;
         bottom: auto;
-        height: 48vh;
+        height: 58vh;
         transform: translateY(-50%);
-        -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%);
-        mask-image: linear-gradient(180deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+        -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
+        mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 90%, transparent 100%);
       }
     }
 
@@ -1057,9 +1063,19 @@
 
     .project-card:hover .project-overlay { transform: translateY(0); opacity: 1; }
 
-    /* En táctil no hay hover: el título del trabajo se queda siempre visible. */
+    /* En táctil no hay hover: el título del trabajo se queda siempre visible,
+       con más fundido debajo porque encima de miniaturas claras no se leía. */
     @media (hover: none) {
-      .project-overlay { transform: translateY(0); opacity: 1; }
+      .project-overlay {
+        transform: translateY(0);
+        opacity: 1;
+        padding: 2.5rem 1.25rem 1.1rem;
+        background: linear-gradient(to top,
+          rgba(7, 8, 10, 0.96) 0%,
+          rgba(7, 8, 10, 0.78) 45%,
+          rgba(7, 8, 10, 0) 100%);
+      }
+      .project-overlay h3 { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); }
     }
 
     .project-overlay h3 {
@@ -1433,6 +1449,22 @@
       .stats { gap: 2rem; }
       .testimonials-grid { grid-template-columns: 1fr; }
       footer { flex-direction: column; text-align: center; }
+    }
+
+    /* Móviles estrechos: "Trabajemos" medía 378 px con solo 326 de hueco y se
+       cortaba por la derecha. Los titulares grandes pasan a escalar con el
+       ancho de pantalla. Va aquí, al final, para ganar por orden a la regla
+       .cta-section .section-title de más arriba (misma especificidad). */
+    @media (max-width: 480px) {
+      .section-title { font-size: clamp(1.7rem, 7.6vw, 2rem); }
+      .cta-section .section-title { font-size: clamp(1.85rem, 8.2vw, 2.5rem); }
+    }
+
+    /* Pantallas muy estrechas (iPhone SE, plegables cerrados): "VISUALS" no
+       cabía en una línea y se salía por la derecha. */
+    @media (max-width: 360px) {
+      .hero-overlay { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .hero h1 { font-size: clamp(2rem, 11.5vw, 2.8rem); }
     }
 
     /* Scrim oscuro que aparece junto al contenido para dar contraste.
