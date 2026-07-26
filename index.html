@@ -417,7 +417,11 @@
       position: relative;
       width: 100%;
       max-width: 100%;
+      /* svh = alto de ventana con la barra del navegador VISIBLE. Con vh a
+         secas, en iOS el pin mide más que lo que se ve y el vídeo queda medio
+         escondido detrás de la barra. La segunda línea gana donde se admite. */
       height: 300vh;
+      height: 300svh;
       overflow: visible;
       /* El hero es un <section> y heredaba "padding: 6rem 2rem", así que el
          vídeo quedaba con 32 px de barra negra a los lados (en móvil parecía
@@ -429,6 +433,7 @@
       position: sticky;
       top: 0;
       height: 100vh;
+      height: 100svh;
       width: 100%;
       overflow: hidden;
       display: flex;
@@ -540,7 +545,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .hero { height: 100vh; }
+      .hero { height: 100vh; height: 100svh; }
       .hero-pin { position: relative; }
       .hero-video-scrub { filter: brightness(0.7); }
     }
@@ -2117,11 +2122,6 @@
     // ═══════════════════════════════════════
     const progressBar = document.getElementById('scrollProgress');
 
-    lenis.on('scroll', ({ scroll, limit }) => {
-      const progress = (scroll / limit) * 100;
-      progressBar.style.width = progress + '%';
-    });
-
     // ═══════════════════════════════════════
     // 9. MAGNETIC BUTTONS
     // ═══════════════════════════════════════
@@ -2183,21 +2183,36 @@
     counters.forEach(c => counterObserver.observe(c));
 
     // ═══════════════════════════════════════
-    // PARALLAX ORBS
+    // 7b. TODO LO QUE REACCIONA AL SCROLL, EN UN SOLO REPINTADO
     // ═══════════════════════════════════════
-    const orbs = document.querySelectorAll('.orb');
+    // Antes había tres manejadores sueltos (barra de progreso, orbes del fondo
+    // y menú) y cada uno escribía estilos en CADA evento de scroll, varios por
+    // fotograma. En móvil eso daba tirones. Ahora se anota la posición y se
+    // pinta una sola vez por fotograma.
+    const orbs   = document.querySelectorAll('.orb');
+    const navbar = document.getElementById('navbar');
+    // Los orbes son tres círculos de hasta 500 px con blur(80px): moverlos en
+    // cada scroll es caro en el móvil y son pura decoración. Ahí se quedan fijos.
+    const esTactil = matchMedia('(hover: none)').matches || matchMedia('(pointer: coarse)').matches;
 
-    lenis.on('scroll', ({ scroll }) => {
-      orbs[0].style.transform = `translate(${Math.sin(scroll * 0.002) * 30}px, ${scroll * 0.15}px)`;
-      orbs[1].style.transform = `translate(${Math.cos(scroll * 0.003) * 25}px, ${scroll * -0.1}px)`;
-      orbs[2].style.transform = `translate(${Math.sin(scroll * 0.001) * 40}px, ${scroll * 0.08}px)`;
-    });
+    let scrollRaf = null, scrollPos = 0, scrollLimite = 1;
 
-    // ═══════════════════════════════════════
-    // NAV SCROLL
-    // ═══════════════════════════════════════
-    lenis.on('scroll', ({ scroll }) => {
-      document.getElementById('navbar').classList.toggle('scrolled', scroll > 50);
+    function pintarScroll() {
+      scrollRaf = null;
+      const s = scrollPos;
+      progressBar.style.width = ((s / scrollLimite) * 100) + '%';
+      navbar.classList.toggle('scrolled', s > 50);
+      if (!esTactil && orbs.length >= 3) {
+        orbs[0].style.transform = `translate(${Math.sin(s * 0.002) * 30}px, ${s * 0.15}px)`;
+        orbs[1].style.transform = `translate(${Math.cos(s * 0.003) * 25}px, ${s * -0.1}px)`;
+        orbs[2].style.transform = `translate(${Math.sin(s * 0.001) * 40}px, ${s * 0.08}px)`;
+      }
+    }
+
+    lenis.on('scroll', ({ scroll, limit }) => {
+      scrollPos = scroll;
+      if (limit) scrollLimite = limit;
+      if (scrollRaf == null) scrollRaf = requestAnimationFrame(pintarScroll);
     });
 
     // ═══════════════════════════════════════
@@ -2321,6 +2336,7 @@
     (function initHeroScrub() {
       try {
         const stage   = document.getElementById('heroStage');
+        const pin     = document.querySelector('.hero-pin');
         const video   = document.getElementById('heroVideo');
         const overlay = document.getElementById('heroOverlay');
         const scrim   = document.getElementById('heroScrim');
@@ -2350,8 +2366,8 @@
         // Sólo reveleamos el contenido (título, CTAs) al final del scrub.
         const CONTENT_FADE_START = 0.65;
         const CONTENT_FADE_END   = 0.90;
-        const fps          = 60;
-        const seekEpsilon  = 1 / (fps * 2);
+        const FPS_VIDEO    = 30;   // a los que están codificados los dos másters
+        let   ultimoFrame  = -1;
 
         let duration        = 0;
         let ready           = false;
@@ -2369,7 +2385,13 @@
         function measure() {
           const rect = stage.getBoundingClientRect();
           stageTop   = rect.top + window.scrollY;
-          stageRange = Math.max(1, rect.height - window.innerHeight);
+          // El pin está pegado (sticky) hasta que su base toca la base del
+          // bloque: ese recorrido es alto del bloque - alto del pin, y punto.
+          // Antes se restaba window.innerHeight, que en iOS NO vale 100vh (la
+          // barra de Safari encoge la ventana ~90 pt). Resultado: el hero se
+          // despegaba y se iba hacia arriba antes de acabar la animación.
+          const altoPin = pin ? pin.offsetHeight : window.innerHeight;
+          stageRange = Math.max(1, stage.offsetHeight - altoPin);
         }
 
         function computeTarget() {
@@ -2393,9 +2415,14 @@
             return;
           }
           currentProgress += delta * LERP;
-          const newTime = currentProgress * duration;
-          if (Math.abs(video.currentTime - newTime) > seekEpsilon) {
-            try { video.currentTime = newTime; } catch (_) {}
+          // Se pide el frame exacto, no un instante cualquiera: los másters van
+          // a 30 fps y antes se lanzaba un salto de vídeo cada 8 ms (60 por
+          // segundo), la mitad de ellos al MISMO frame. Cada salto obliga al
+          // móvil a decodificar y repintar: de ahí el tirón al bajar.
+          const frame = Math.round(currentProgress * duration * FPS_VIDEO);
+          if (frame !== ultimoFrame) {
+            ultimoFrame = frame;
+            try { video.currentTime = frame / FPS_VIDEO; } catch (_) {}
           }
           rafId = requestAnimationFrame(tick);
         }
@@ -2433,12 +2460,21 @@
           if (!actual || actual.indexOf(archivo) !== -1) return;
           ready = false;
           duration = 0;
+          ultimoFrame = -1;
           video.src = toca;
           try { video.load(); } catch (_) {}
         }
 
+        let fuenteRevisadaAlArrancar = false;
+
         function onReady() {
           marcarOrientacion();
+          // Red de seguridad: si el navegador no hizo caso al media de los
+          // <source> y cargó el que no toca, se corrige (una sola vez).
+          if (!fuenteRevisadaAlArrancar && video.readyState >= 1) {
+            fuenteRevisadaAlArrancar = true;
+            revisarFuente();
+          }
           if (ready) return;
           // HAVE_METADATA (>=1) ya permite setear currentTime.
           if (video.readyState < 1 || !isFinite(video.duration) || video.duration <= 0) return;
@@ -2528,6 +2564,16 @@
         window.addEventListener('orientationchange', () => {
           setTimeout(() => { revisarFuente(); measure(); computeTarget(); schedule(); }, 250);
         });
+
+        // En iOS la barra de Safari aparece y desaparece al hacer scroll y eso
+        // cambia la ventana sin disparar 'resize'. visualViewport sí avisa.
+        if (window.visualViewport) {
+          let vvTimer = null;
+          window.visualViewport.addEventListener('resize', () => {
+            clearTimeout(vvTimer);
+            vvTimer = setTimeout(() => { measure(); computeTarget(); schedule(); }, 80);
+          });
+        }
 
         document.addEventListener('visibilitychange', () => {
           if (!document.hidden) {
