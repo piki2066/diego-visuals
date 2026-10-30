@@ -4,7 +4,7 @@
     "badgeVisible": true,
     "titleLines": [
       "DIEGO",
-      "VISUALS"
+      "ORTIZ"
     ],
     "subtitle": "Editor & Director Creativo",
     "description": "Creando visuales de alto impacto que cuentan historias, conectan audiencias y añaden valor a cada proyecto.",
@@ -25,22 +25,22 @@
   },
   "stats": [
     {
-      "value": 50,
+      "value": 100,
       "suffix": "+",
       "label": "Proyectos"
     },
     {
-      "value": 10,
+      "value": 15,
       "suffix": "+",
       "label": "Clientes"
     },
     {
-      "value": 3,
+      "value": 5,
       "suffix": "+",
       "label": "Años de exp."
     },
     {
-      "value": 2,
+      "value": 5,
       "suffix": "M+",
       "label": "Visualizaciones"
     }
@@ -48,24 +48,34 @@
   "clients": [
     {
       "name": "RIvers",
-      "desc": "4,55 M Suscriptores",
+      "desc": "4,67 M Suscriptores",
       "photo": "assets/uploads/photo-1785930496566.jpg"
     },
     {
       "name": "Jcorko",
-      "desc": "255 K Suscriptores",
+      "desc": "258 K Suscriptores",
       "photo": "assets/uploads/photo-1785930500994.jpg"
     },
     {
+      "name": "Jonata_26",
+      "desc": "10.9M Seguidores",
+      "photo": "assets/uploads/photo-1793351002362.jpeg"
+    },
+    {
+      "name": "Edu Serrano",
+      "desc": "164K Suscriptores",
+      "photo": "assets/uploads/photo-1793351138698.jpg"
+    },
+    {
       "name": "Marcos Balmain",
-      "desc": "4,5 K Suscriptores",
-      "photo": "assets/uploads/photo-1790178683285.jpg"
+      "desc": "#1 Shopify Partner de España",
+      "photo": "assets/uploads/photo-1793351173732.jpg"
     }
   ],
   "projects": [
     {
       "title": "Estudio profesional",
-      "category": "Producción de vídeo",
+      "category": "Motion graphics · Sonido",
       "video": "https://youtu.be/fZRxdByj74k",
       "thumb": "",
       "preview": "",
@@ -74,8 +84,8 @@
     {
       "title": "Motion graphics y diseño de sonido",
       "category": "Motion graphics · Sonido",
-      "video": "https://youtu.be/SIh2LkOgZvQ?si=zEFuBEN5oJhdqefQ",
-      "thumb": "",
+      "video": "https://youtu.be/pU-pJFaLJ8U?si=TmVG1yDzurntOIJp",
+      "thumb": "assets/uploads/thumb-1793351327048.jpeg",
       "preview": "",
       "comingSoon": false
     },
@@ -91,6 +101,22 @@
       "title": "Vlog",
       "category": "Edición estilo vlog",
       "video": "https://youtu.be/UO5wFyHaMuU",
+      "thumb": "",
+      "preview": "",
+      "comingSoon": false
+    },
+    {
+      "title": "Video Roadmap",
+      "category": "Motion graphics · Sonido",
+      "video": "https://youtu.be/FvRbCz8CX3M?si=oglsIa6xiomE_5GQ",
+      "thumb": "",
+      "preview": "",
+      "comingSoon": false
+    },
+    {
+      "title": "Vlog",
+      "category": "Edición estilo vlog",
+      "video": "https://youtu.be/ypwgU7zCgE4?si=dj9gQ8I-PQ_gRd2p",
       "thumb": "",
       "preview": "",
       "comingSoon": false
@@ -124,6 +150,6 @@
   "contact": {
     "email": "diego8visuals@gmail.com",
     "x": "https://x.com/diego8visuals",
-    "instagram": "https://instagram.com/diego8visuals"
+    "instagram": "https://instagram.com/diego.kqz"
   }
 }
